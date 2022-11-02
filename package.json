@@ -1,14 +1,14 @@
 {
   "name": "geek-week",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "nodemon"
   },
   "keywords": [],
-  "author": "",
+  "author": "Glowacki Games Studio",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.0.3",

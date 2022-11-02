@@ -83,11 +83,8 @@ app.get("/api/getQuestions", (req, res) => {
         res.json(questions);
     });
 })
-app.get("/api", (req, res) => {
-    getQuestions().then((questions) => {
-        res.json(questions);
-    });
+app.get("/api/ping", (req, res) => {
+    res.send("pong");
 })
-
 
 app.listen(PORT, HOST);
