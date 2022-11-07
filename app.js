@@ -65,13 +65,11 @@ function getQuestions() {
     return new Promise((resolve, reject) => {
         conn.query("SELECT id, question FROM questions ORDER BY RAND() LIMIT 10;", (err, response) => {
             Promise.allSettled(response.map((question) => getAnswers(question.id)))
-                .then((answers) => answers.map((answer, index) => {
-                    return {
-                        question: response[index].question,
-                        answers: answer.value.answers,
-                        correctAnswer: answer.value.correctAnswer
-                    }
-                }))
+                .then((answers) => answers.map((answer, index) => ({
+                    question: response[index].question,
+                    answers: answer.value.answers,
+                    correctAnswer: answer.value.correctAnswer
+                })))
                 .then(resolve);
         })
     })
