@@ -56,4 +56,4 @@ router.post('/logout', (req, res) => {
     res.json({ error: false, message: 'Wylogowano pomyślnie' });
 });
 
-module.export = router;
+module.exports = router;

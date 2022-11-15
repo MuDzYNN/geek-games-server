@@ -58,4 +58,4 @@ router.get('/fetch', (req, res) => {
     getQuestions().then(questions => res.json(questions));
 });
 
-module.export = router;
+module.exports = router;
