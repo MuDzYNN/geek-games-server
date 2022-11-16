@@ -11,6 +11,20 @@ router.use(cors({
     credentials: true
 }));
 
+router.use((req, res, next) => {
+    const { token } = req.cookies;
+
+    if (!token) return next();
+
+    Verify(token).then(payload => {
+        req.user = payload;
+        next();
+    }).catch(error => {
+        Logger('error', error);
+        next();
+    });
+});
+
 router.use('/auth', require('./auth'));
 router.use('/questions', require('./questions'));
 
