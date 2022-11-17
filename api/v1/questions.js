@@ -5,6 +5,7 @@ const { pool } = require('../../libs/database');
 function getCorrectAnswer(questionId) {
     return new Promise((resolve, reject) => {
         pool.query("SELECT answer FROM answers WHERE isCorrect = 1 AND question_id = ? ORDER BY RAND() LIMIT 1;", questionId, (err, response) => {
+            if (err) return reject(err);
             resolve(response[0].answer);
         });
     });
@@ -13,6 +14,7 @@ function getCorrectAnswer(questionId) {
 function getWrongAnswers(questionId) {
     return new Promise((resolve, reject) => {
         pool.query("SELECT answer FROM answers WHERE isCorrect = 0 AND question_id = ? ORDER BY RAND() LIMIT 2;", questionId, (err, response) => {
+            if (err) return reject(err);
             resolve(response.map((row) => row.answer));
         });
     });
@@ -43,6 +45,8 @@ function getAnswers(questionId) {
 function getQuestions() {
     return new Promise((resolve, reject) => {
         pool.query("SELECT id, question FROM questions ORDER BY RAND() LIMIT 10;", (err, response) => {
+            if (err) return reject(err);
+
             Promise.allSettled(response.map((question) => getAnswers(question.id)))
                 .then((answers) => answers.map((answer, index) => ({
                     question: response[index].question,
