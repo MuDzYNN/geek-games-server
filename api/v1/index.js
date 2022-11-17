@@ -3,6 +3,7 @@ const router = express.Router();
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 
+router.use('/ping', require('./ping'));
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 router.use(cookieParser());
