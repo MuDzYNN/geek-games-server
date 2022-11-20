@@ -1,8 +1,8 @@
 const router = require('express').Router();
-const Logger = require('../../libs/logger');
-const { Hash, Compare } = require('../../libs/bcrypt');
-const { pool } = require('../../libs/database');
-const { Verify, Sign } = require('../../libs/jwt');
+const Logger = require('./libs/logger');
+const { Hash, Compare } = require('./libs/bcrypt');
+const { pool } = require('./libs/database');
+const { Verify, Sign } = require('./libs/jwt');
 
 router.post('/login', (req, res) => {
     const { login, password } = req.body;
@@ -17,8 +17,8 @@ router.post('/login', (req, res) => {
         }
         if (!result[0]) return res.json({ error: true, message: 'Nieprawidłowy login' });
 
-        Compare(password, result[0].password).then(result => {
-            if (!result) return res.json({ error: true, message: 'Nieprawidłowe hasło' });
+        Compare(password, result[0].password).then(isPasswordValid => {
+            if (!isPasswordValid) return res.json({ error: true, message: 'Nieprawidłowe hasło' });
 
             Sign({
                 ...result[0],
@@ -26,7 +26,7 @@ router.post('/login', (req, res) => {
                 res.cookie('token', token, {
                     httpOnly: true,
                     secure: true,
-                    maxAge: 10000,
+                    maxAge: 10000000,
                 });
                 return res.json({ error: false, message: 'Zalogowano', data: { loggedIn: true, user: 'admin' } });
             }).catch(error => {

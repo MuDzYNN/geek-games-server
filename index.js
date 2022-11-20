@@ -1,5 +1,4 @@
 const app = require('express')();
-const Logger = require('./libs/logger');
 require('dotenv').config();
 
 app.get('/', (req, res) => {
@@ -8,4 +7,4 @@ app.get('/', (req, res) => {
 
 app.use('/', require('./api'));
 
-app.listen(process.env.APP_PORT, () => Logger('warn', `Listening at http://localhost:${process.env.APP_PORT}`));
+app.listen(process.env.APP_PORT, () => console.log(`Listening at http://localhost:${process.env.APP_PORT}`));

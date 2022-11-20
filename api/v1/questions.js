@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const Logger = require('../../libs/logger');
-const { pool } = require('../../libs/database');
+const Logger = require('./libs/logger');
+const { pool } = require('./libs/database');
 
 function getCorrectAnswer(questionId) {
     return new Promise((resolve, reject) => {
@@ -58,8 +58,41 @@ function getQuestions() {
     });
 };
 
-router.get('/fetch', (req, res) => {
-    getQuestions().then(questions => res.json(questions));
+router.get('/fetch', (req, res, next) => {
+    getQuestions().then(questions => res.json(questions)).catch(next);
+});
+
+router.get('/getAmmount', (req, res, next) => {
+    pool.promise().query('SELECT COUNT(*) FROM questions').then(([result]) => {
+        console.log(result)
+        res.json({ error: false, data: { amountOfQuestion: result[0]['COUNT(*)'] } });
+    }).catch(next);
+});
+
+router.post('/fetchQuetions', (req, res, next) => {
+    const { from, limit } = req.body;
+
+    pool.promise().query('SELECT * FROM questions LIMIT ?, ?', [from, limit]).then(([result]) => {
+        res.json({ error: false, data: result });
+    }).catch(next);
+});
+
+router.get('/fetchAnswers', (req, res, next) => {
+    const { question } = req.query;
+
+    pool.promise().query('SELECT answer, isCorrect FROM answers WHERE question_id = ?', [question]).then(([result]) => {
+        const answers = {
+            wrongAnswers: [],
+            goodAnswers: [],
+        };
+
+        result.forEach(data => {
+            if (data.isCorrect) return answers.goodAnswers.push(data.answer);
+            answers.wrongAnswers.push(data.answer);
+        });
+
+        res.json({ error: false, data: answers });
+    }).catch(next);
 });
 
 module.exports = router;
