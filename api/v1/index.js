@@ -3,6 +3,9 @@ const router = express.Router();
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const { Verify } = require('./libs/jwt');
+const { pool } = require('./libs/database');
+const Logger = require('./libs/logger');
+const { FetchAll } = require('./libs/permissions');
 
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
@@ -25,17 +28,24 @@ router.use((req, res, next) => {
     if (!token) return res.status(401).json({ error: true, message: 'Unauthorized' });
 
     Verify(token).then(payload => {
-        req.user = payload;
-        return next();
+        pool.promise().query('SELECT id, login, role, permissions FROM users WHERE id=?', [payload.id]).then(async ([result]) => {
+            const user = result[0];
+            user.permissions = JSON.parse(result[0].permissions);
+            if (user.permissions[0] == '*') user.permissions = await FetchAll();
+            req.user = user;
+            next();
+        }).catch(error => {
+            Logger('error', error);
+            res.status(401).json({ error: true, message: 'Unauthorized' });
+        });
     }).catch(error => {
         Logger('error', error);
-        return res.status(401).json({ error: true, message: 'Unauthorized' });
+        res.status(401).json({ error: true, message: 'Unauthorized' });
     });
 });
 
 // Private routes
 router.get('/fetchUser', (req, res) => {
-    console.log(req.user)
     res.json(req.user);
 });
 
