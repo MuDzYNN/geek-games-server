@@ -1,8 +1,7 @@
 const router = require('express').Router();
-const Logger = require('./libs/logger');
 const { Hash, Compare } = require('./libs/bcrypt');
 const { pool } = require('./libs/database');
-const { Verify, Sign } = require('./libs/jwt');
+const { Sign } = require('./libs/jwt');
 
 router.post('/login', (req, res, next) => {
     const { login, password } = req.body;
@@ -10,21 +9,21 @@ router.post('/login', (req, res, next) => {
     if (!login) return res.json({ error: true, message: 'Uzupełnij pole login' });
     if (!password) return res.json({ error: true, message: 'Uzupełnij pole hasło' });
 
-    pool.promise().query('SELECT * FROM users WHERE login=?', [login]).then(([result]) => {
+    pool.promise().query('SELECT id, password FROM users WHERE login=?', [login]).then(([result]) => {
         if (!result[0]) return res.json({ error: true, message: 'Nieprawidłowy login' });
 
         Compare(password, result[0].password).then(isPasswordValid => {
             if (!isPasswordValid) return res.json({ error: true, message: 'Nieprawidłowe hasło' });
 
             Sign({
-                ...result[0],
+                id: result[0].id,
             }).then(token => {
                 res.cookie('token', token, {
                     httpOnly: true,
                     secure: true,
                     maxAge: 10000000,
                 });
-                return res.json({ error: false, message: 'Zalogowano', data: { loggedIn: true, user: 'admin' } });
+                return res.json({ error: null, message: 'Zalogowano', data: { loggedIn: true, user: 'admin' } });
             }).catch(next);
         }).catch(next);
     }).catch(next);
@@ -46,8 +45,8 @@ router.post('/register', (req, res, next) => {
         if (result[0]) return res.json({ error: true, message: `${login === result[0].login ? 'Login' : 'Adres e-mail'} jest już zajęty` });
 
         Hash(password).then(hash => {
-            pool.promise().query('INSERT INTO users (login, email, password, permissions) VALUES (?, ?, ?, "[]")', [login, email, hash]).then(() => {
-                res.json({ error: false, message: "Zarejestrowano pomyślnie. Zaloguj się aby kontynuować" });
+            pool.promise().query('INSERT INTO users (login, email, password, permissions) VALUES (?, ?, ?, ?)', [login, email, hash, '["questions-fetch"]']).then(() => {
+                res.json({ error: null, message: "Zarejestrowano pomyślnie. Zaloguj się aby kontynuować" });
             }).catch(next);
         }).catch(next);
     }).catch(next);
@@ -55,7 +54,7 @@ router.post('/register', (req, res, next) => {
 
 router.post('/logout', (req, res) => {
     res.clearCookie('token');
-    res.json({ error: false, message: 'Wylogowano pomyślnie' });
+    res.json({ error: null, message: 'Wylogowano pomyślnie' });
 });
 
 module.exports = router;

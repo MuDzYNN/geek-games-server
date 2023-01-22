@@ -59,13 +59,13 @@ function getQuestions() {
     });
 };
 
-router.get('/fetch', (req, res, next) => {
+router.get('/fetch', CheckPermissionMiddleware('questions-fetch'), (req, res, next) => {
     getQuestions().then(questions => res.json(questions)).catch(next);
 });
 
 router.get('/getAmmount', CheckPermissionMiddleware('questions-list'), (req, res, next) => {
     pool.promise().query('SELECT COUNT(*) FROM questions').then(([result]) => {
-        res.json({ error: false, data: { amountOfQuestion: result[0]['COUNT(*)'] } });
+        res.json({ error: null, data: { amountOfQuestion: result[0]['COUNT(*)'] } });
     }).catch(next);
 });
 
@@ -73,7 +73,7 @@ router.post('/fetchQuetions', CheckPermissionMiddleware('questions-list'), (req,
     const { from, limit } = req.body;
 
     pool.promise().query('SELECT * FROM questions LIMIT ?, ?', [from, limit]).then(([result]) => {
-        res.json({ error: false, data: result });
+        res.json({ error: null, data: result });
     }).catch(next);
 });
 
@@ -90,7 +90,7 @@ router.get('/fetchAnswers', CheckPermissionMiddleware('questions-list'), (req, r
             answers[data.isCorrect ? 'goodAnswers' : 'wrongAnswers'].push(data.answer)
         });
 
-        res.json({ error: false, data: answers });
+        res.json({ error: null, data: answers });
     }).catch(next);
 });
 
@@ -105,7 +105,7 @@ router.post('/add', CheckPermissionMiddleware('questions-add'), (req, res, next)
         const wrongAnswers = req.body.wrongAnswers.map(v => [questionId, v, 0]);
 
         pool.promise().query('INSERT INTO answers (question_id, answer, isCorrect) VALUES ?', [[...goodAnswers, ...wrongAnswers]]).then(() => {
-            res.json({ error: false, message: 'Dodano pytanie do bazy danych' });
+            res.json({ error: null, message: 'Dodano pytanie do bazy danych' });
         }).catch(next);
     }).catch(next);
 });

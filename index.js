@@ -1,4 +1,5 @@
 const app = require('express')();
+require('express-ws')(app);
 require('dotenv').config();
 
 app.get('/', (req, res) => {
