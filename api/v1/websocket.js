@@ -83,7 +83,7 @@ const AuthSystemCodeResponse = (ws, state) => {
         message: 'Zalogowano!',
         data: {
             token: metadata.cookies.token,
-            user: metadata.user,
+            ...metadata.user,
         }
     }));
 
