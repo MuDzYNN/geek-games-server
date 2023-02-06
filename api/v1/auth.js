@@ -23,7 +23,7 @@ router.post('/login', (req, res, next) => {
                     secure: true,
                     maxAge: 10000000,
                 });
-                return res.json({ error: null, message: 'Zalogowano', data: { loggedIn: true, user: 'admin' } });
+                return res.json({ error: false, message: 'Zalogowano', data: { loggedIn: true, user: 'admin' } });
             }).catch(next);
         }).catch(next);
     }).catch(next);
@@ -46,7 +46,7 @@ router.post('/register', (req, res, next) => {
 
         Hash(password).then(hash => {
             pool.promise().query('INSERT INTO users (login, email, password, permissions) VALUES (?, ?, ?, ?)', [login, email, hash, '["questions-fetch"]']).then(() => {
-                res.json({ error: null, message: "Zarejestrowano pomyślnie. Zaloguj się aby kontynuować" });
+                res.json({ error: false, message: "Zarejestrowano pomyślnie. Zaloguj się aby kontynuować" });
             }).catch(next);
         }).catch(next);
     }).catch(next);
@@ -54,7 +54,7 @@ router.post('/register', (req, res, next) => {
 
 router.post('/logout', (req, res) => {
     res.clearCookie('token');
-    res.json({ error: null, message: 'Wylogowano pomyślnie' });
+    res.json({ error: false, message: 'Wylogowano pomyślnie' });
 });
 
 module.exports = router;

@@ -18,7 +18,7 @@ router.use(cors({
 
 // Get information from token
 router.use((req, res, next) => {
-    const token = req?.cookies?.token ? req.cookies.token : req?.body?.token;
+    const token = req?.cookies?.token ?? req?.body?.token;
 
     if (token) {
         req.token = token;
@@ -56,7 +56,7 @@ router.get('/generateToken', (req, res, next) => {
         id: null,
         login: 'Gość',
     }).then(token => {
-        res.json({ error: null, data: { token } });
+        res.json({ error: false, data: { token } });
     }).catch(next);
 });
 

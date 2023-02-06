@@ -59,10 +59,10 @@ const AuthSystemCodeCheck = (ws, userCode) => {
 
     registerSystem[userId].gameWs = ws;
 
-    ws.send(JSON.stringify({ action: 'LOGIN_SYSTEM_DISPLAY_MESSAGE', error: null, message: 'Zaakceptuj logowanie w przeglądarce' }));
+    ws.send(JSON.stringify({ action: 'LOGIN_SYSTEM_DISPLAY_MESSAGE', error: false, message: 'Zaakceptuj logowanie w przeglądarce' }));
     userData.ws.send(JSON.stringify({
         action: 'LOGIN_SYSTEM_ASK_LOGIN',
-        error: null,
+        error: false,
         message: 'Nowe logowanie',
         data: {
             location: null,
@@ -79,7 +79,7 @@ const AuthSystemCodeResponse = (ws, state) => {
 
     registerSystem[metadata.id].gameWs.send(JSON.stringify({
         action: 'LOGIN_SYSTEM_CODE_FINALLY',
-        error: null,
+        error: false,
         message: 'Zalogowano!',
         data: {
             token: metadata.cookies.token,
