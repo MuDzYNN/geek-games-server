@@ -23,7 +23,10 @@ router.use((req, res, next) => {
     if (token) {
         req.token = token;
         Verify(req.token).then(payload => {
-            if (req.token.id === null) return req.user = payload;
+            if (payload.id === null) {
+                req.user = payload
+                return next();
+            };
             pool.promise().query('SELECT id, login, role, permissions FROM users WHERE id=?', [payload.id]).then(async ([result]) => {
                 const user = result[0];
                 user.permissions = JSON.parse(result[0].permissions);
