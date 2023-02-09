@@ -23,6 +23,7 @@ router.use((req, res, next) => {
     if (token) {
         req.token = token;
         Verify(req.token).then(payload => {
+            if (req.token.id === null) return req.user = payload;
             pool.promise().query('SELECT id, login, role, permissions FROM users WHERE id=?', [payload.id]).then(async ([result]) => {
                 const user = result[0];
                 user.permissions = JSON.parse(result[0].permissions);
@@ -52,9 +53,10 @@ router.use('/ping', (req, res) => {
 router.use('/websocket', require('./websocket'));
 router.get('/generateToken', (req, res, next) => {
     Sign({
-        permissions: 'questions-fetch',
         id: null,
         login: 'Gość',
+        role: 'guest',
+        permissions: 'questions-fetch',
     }).then(token => {
         res.json({ error: false, data: { token } });
     }).catch(next);
