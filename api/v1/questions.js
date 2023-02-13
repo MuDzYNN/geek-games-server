@@ -60,10 +60,10 @@ function getQuestions() {
 };
 
 router.post('/fetch', CheckPermissionMiddleware('questions-fetch'), (req, res, next) => {
-    getQuestions().then(questions => res.json(questions)).catch(next);
+    getQuestions().then(questions => res.json({ error: false, data: { questions } })).catch(next);
 });
 
-router.post('/getAmmount', CheckPermissionMiddleware('questions-list'), (req, res, next) => {
+router.get('/getAmmount', CheckPermissionMiddleware('questions-list'), (req, res, next) => {
     pool.promise().query('SELECT COUNT(*) FROM questions').then(([result]) => {
         res.json({ error: false, data: { amountOfQuestion: result[0]['COUNT(*)'] } });
     }).catch(next);
@@ -77,7 +77,7 @@ router.post('/fetchQuetions', CheckPermissionMiddleware('questions-list'), (req,
     }).catch(next);
 });
 
-router.post('/fetchAnswers', CheckPermissionMiddleware('questions-list'), (req, res, next) => {
+router.get('/fetchAnswers', CheckPermissionMiddleware('questions-list'), (req, res, next) => {
     const { question } = req.query;
 
     pool.promise().query('SELECT answer, isCorrect FROM answers WHERE question_id = ?', [question]).then(([result]) => {

@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 const Sign = payload => {
     return new Promise((resolve, reject) => {
-        jwt.sign(payload, process.env.JWT_SECRET, (error, token) => {
+        jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' }, (error, token) => {
             if (error) return reject(error);
             resolve(token);
         });

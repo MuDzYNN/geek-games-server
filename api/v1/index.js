@@ -76,7 +76,7 @@ router.use((req, res, next) => {
 
 // Private routes
 router.get('/fetchUser', (req, res) => {
-    res.json(req.user);
+    res.json({ error: false, data: { user: req.user } });
 });
 
 router.use('/questions', require('./questions'));
