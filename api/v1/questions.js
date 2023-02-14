@@ -98,8 +98,9 @@ router.post('/add', CheckPermissionMiddleware('questions-add'), (req, res, next)
     if (!req.body.question) return res.json({ error: true, message: 'Missing body parameter "question"' });
     if (!req.body.goodAnswers) return res.json({ error: true, message: 'Missing body parameter "goodAnswers"' });
     if (!req.body.wrongAnswers) return res.json({ error: true, message: 'Missing body parameter "wrongAnswers"' });
+    const question = req.body.question.charAt(0).toUpperCase() + req.body.question.slice(1);
 
-    pool.promise().query('INSERT INTO questions (question) VALUES (?)', [req.body.question]).then(([result]) => {
+    pool.promise().query('INSERT INTO questions (question) VALUES (?)', [question]).then(([result]) => {
         const questionId = result.insertId;
         const goodAnswers = req.body.goodAnswers.map(v => [questionId, v, 1]);
         const wrongAnswers = req.body.wrongAnswers.map(v => [questionId, v, 0]);
