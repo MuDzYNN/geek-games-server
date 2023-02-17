@@ -80,5 +80,6 @@ router.get('/fetchUser', (req, res) => {
 });
 
 router.use('/questions', require('./questions'));
+router.use('/game', require('./game'));
 
 module.exports = router;
