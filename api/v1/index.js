@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const cors = require('cors');
+const path = require('path');
 const cookieParser = require('cookie-parser');
 const { Verify, Sign } = require('./libs/jwt');
 const { pool } = require('./libs/database');
@@ -65,6 +66,11 @@ router.get('/generateToken', (req, res, next) => {
     }).catch(next);
 });
 
+router.get('/download', (req, res) => {
+    const file = path.join(__dirname, 'game/latest.zip');
+    res.download(file);
+});
+
 // Private routes middlware
 router.use((req, res, next) => {
     if (!req.user) {
@@ -76,6 +82,10 @@ router.use((req, res, next) => {
 
 // Private routes
 router.get('/fetchUser', (req, res) => {
+    res.json({ error: false, data: { user: req.user } });
+});
+
+router.post('/fetchUser', (req, res) => {
     res.json({ error: false, data: { user: req.user } });
 });
 
