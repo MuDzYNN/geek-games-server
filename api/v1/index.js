@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const cors = require('cors');
+const crypto = require('crypto');
+const { exec } = require('child_process');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const { Verify, Sign } = require('./libs/jwt');
@@ -19,8 +21,14 @@ router.use(cors({
 
 // Build after push
 router.post('/gitPush', (req, res) => {
-    console.log(req.body, req.headers);
-    res.json({ error: false });
+    const signature = Buffer.from(req.get('X-Hub-Signature-256'), 'utf-8');
+    const hmac = crypto.createHmac('sha256', '1047ef4b1330da5a82a5d731e8c4114e1dc32137');
+    const digest = Buffer.from(`sha256=${hmac.update(req.rawBody).digest('hex')}`, 'utf-8');
+    if (signature.length !== digest.length || !crypto.timingSafeEqual(digest, signature)) {
+        return res.json({ error: true, message: `Request body digest (${digest}) did not match ${sigHeaderName} (${sig})` });
+    }
+    exec('sudo bash /home/geek-game/build_site.sh');
+    res.json({ error: false, message: 'Running build' });
 });
 
 // Get information from token
