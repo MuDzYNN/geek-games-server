@@ -11,7 +11,13 @@ const Logger = require('./libs/logger');
 const { FetchAll } = require('./libs/permissions');
 require('./websocket');
 
-router.use(express.json());
+router.use(express.json({
+    verify: (req, res, buf, encoding) => {
+        if (buf && buf.length) {
+            req.rawBody = buf.toString(encoding || 'utf-8');
+        }
+    },
+}));
 router.use(express.urlencoded({ extended: true }));
 router.use(cookieParser());
 router.use(cors({
