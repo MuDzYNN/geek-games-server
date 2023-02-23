@@ -17,6 +17,12 @@ router.use(cors({
     credentials: true
 }));
 
+// Build after push
+router.post('/gitPush', (req, res) => {
+    console.log(req.body, req.headers);
+    res.json({ error: false });
+});
+
 // Get information from token
 router.use((req, res, next) => {
     const token = req?.cookies?.token ?? req?.body?.token;
