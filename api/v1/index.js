@@ -28,6 +28,7 @@ router.post('/gitPush', (req, res) => {
         return res.json({ error: true, message: `Request body digest (${digest}) did not match ${sigHeaderName} (${sig})` });
     }
     exec('bash /home/geek-game/build_site.sh');
+    console.log('Pushed to git! Pulling and building :)');
     res.json({ error: false, message: 'Running build' });
 });
 
