@@ -11,7 +11,7 @@ const FetchAll = () => {
 
 const CheckPermissionMiddleware = permission => {
     return (req, res, next) => {
-        if (!req.user.permissions.includes(permission)) return res.json({ error: true, message: 'You are not permitted to do that!' });
+        if (!req?.user?.permissions?.includes(permission)) return res.json({ error: true, message: 'You are not permitted to do that!' });
         next();
     };
 };

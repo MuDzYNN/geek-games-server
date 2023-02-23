@@ -70,6 +70,7 @@ router.use((req, res, next) => {
 
 // Public routes
 router.use('/auth', require('./auth'));
+router.use('/suggestions', require('./suggestions'));
 router.use('/ping', (req, res) => {
     console.log(req.user)
     res.send("Pong!");

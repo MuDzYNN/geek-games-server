@@ -28,7 +28,7 @@ router.post('/fetchOneBest', (req, res, next) => {
 });
 
 router.post('/fetchHistory', (req, res, next) => {
-    pool.query('SELECT games.score, UNIX_TIMESTAMP(games.timestamp) * 1000 AS timestamp, gamemodes.name, gamemodes.label FROM games INNER JOIN gamemodes ON games.gamemode_id = gamemodes.id WHERE games.user_id = ? ORDER BY games.id DESC LIMIT 10 ', [req.user.id], (err, result) => {
+    pool.query('SELECT games.score, UNIX_TIMESTAMP(games.timestamp) * 1000 AS timestamp, gamemodes.name, gamemodes.label FROM games INNER JOIN gamemodes ON games.gamemode_id = gamemodes.id WHERE games.user_id = ? ORDER BY games.id DESC LIMIT 10', [req.user.id], (err, result) => {
         if (err) return next(result);
         res.json({ error: false, data: result });
     });
