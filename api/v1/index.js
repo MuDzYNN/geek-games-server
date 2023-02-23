@@ -27,7 +27,7 @@ router.post('/gitPush', (req, res) => {
     if (signature.length !== digest.length || !crypto.timingSafeEqual(digest, signature)) {
         return res.json({ error: true, message: `Request body digest (${digest}) did not match ${sigHeaderName} (${sig})` });
     }
-    exec('sudo bash /home/geek-game/build_site.sh');
+    exec('bash /home/geek-game/build_site.sh');
     res.json({ error: false, message: 'Running build' });
 });
 
