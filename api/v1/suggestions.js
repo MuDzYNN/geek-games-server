@@ -9,16 +9,36 @@ router.get('/getAmmount', CheckPermissionMiddleware('questions-propositions'), (
     }).catch(next);
 });
 
-router.get('/accept', CheckPermissionMiddleware('questions-propositions'), (req, res, next) => {
-    const { question } = req.query;
+router.get('/accept', CheckPermissionMiddleware('questions-propositions'), async (req, res, next) => {
+    const { question: questionId } = req.query;
 
-    pool.promise().query('').then(([result]) => {
-        res.json({ error: false });
-    }).catch(next);
+    try {
+        const [question] = await pool.promise().query('SELECT question FROM questions_propositions WHERE id = ?', [questionId]);
+        const [answers] = await pool.promise().query('SELECT answer, isCorrect FROM answers_propositions WHERE question_id = ?', [questionId]);
+        if (!question[0] || !answers[0]) res.json({ error: true, message: 'Invalid question ID' });
+        const [result] = await pool.promise().query('INSERT INTO questions (question) VALUES (?)', [question[0].question]);
+        const { insertId: newQuestionId } = result;
+        await pool.promise().query('INSERT INTO answers (question_id, answer, isCorrect) VALUES ?', [
+            answers.map(questionData => ([newQuestionId, ...Object.values(questionData)]))
+        ]);
+        await pool.promise().query('DELETE FROM answers_propositions WHERE question_id = ?', [questionId]);
+        await pool.promise().query('DELETE FROM questions_propositions WHERE id = ?', [questionId]);
+        res.json({ error: false, message: 'Question accepted' });
+    } catch (err) {
+        next(err);
+    }
 });
 
-router.get('/delete', CheckPermissionMiddleware('questions-propositions'), (req, res, next) => {
-    const { question } = req.query;
+router.get('/delete', CheckPermissionMiddleware('questions-propositions'), async (req, res, next) => {
+    const { question: questionId } = req.query;
+
+    try {
+        await pool.promise().query('DELETE FROM answers_propositions WHERE question_id = ?', [questionId]);
+        await pool.promise().query('DELETE FROM questions_propositions WHERE id = ?', [questionId]);
+        res.json({ error: false, message: 'Question deleted' });
+    } catch (err) {
+        next(err);
+    }
 });
 
 router.post('/fetchQuetions', CheckPermissionMiddleware('questions-propositions'), (req, res, next) => {
