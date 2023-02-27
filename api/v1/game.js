@@ -35,11 +35,11 @@ router.post('/fetchHistory', (req, res, next) => {
 });
 
 router.post('/saveResult', (req, res, next) => {
-    const { userId, gamemodeId, score } = req.body;
+    const { userId, gamemodeId, score, duration } = req.body;
 
-    if (!userId || !gamemodeId || !score) return res.json({ error: false, message: 'Missing body params! Requires params: "userId", "gamemodeId", "score"' });
+    if (!userId || !gamemodeId || !score || !duration) return res.json({ error: false, message: 'Missing body params! Requires params: "userId", "gamemodeId", "score", "duration"' });
 
-    pool.query('INSERT INTO games (user_id, gamemode_id, score) VALUES (?, ?, ?)', [userId, gamemodeId, score], (err) => {
+    pool.query('INSERT INTO games (user_id, gamemode_id, score, duration) VALUES (?, ?, ?, ?)', [userId, gamemodeId, score, duration], (err) => {
         if (err) return next(err);
         res.json({ error: false, message: 'Succesfully saved game!' });
     });
