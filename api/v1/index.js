@@ -89,7 +89,7 @@ router.get('/generateToken', (req, res, next) => {
 });
 
 router.get('/download', (req, res) => {
-    const file = path.join(__dirname, 'game/latest.zip');
+    const file = path.join(__dirname, 'game/geek-game.exe');
     res.download(file);
 });
 
